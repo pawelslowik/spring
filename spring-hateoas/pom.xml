@@ -11,6 +11,10 @@
 
     <artifactId>spring-hateoas</artifactId>
 
+    <properties>
+        <start-class>pl.com.psl.spring.hateoas.App</start-class>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
