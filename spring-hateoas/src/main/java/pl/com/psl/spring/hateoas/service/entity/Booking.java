@@ -1,4 +1,4 @@
-package pl.com.psl.spring.hateoas.service;
+package pl.com.psl.spring.hateoas.service.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.hateoas.ResourceSupport;

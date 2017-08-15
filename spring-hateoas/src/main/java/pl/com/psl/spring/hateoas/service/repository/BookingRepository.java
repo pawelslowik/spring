@@ -1,6 +1,7 @@
-package pl.com.psl.spring.hateoas.service;
+package pl.com.psl.spring.hateoas.service.repository;
 
 import org.springframework.data.repository.CrudRepository;
+import pl.com.psl.spring.hateoas.service.entity.Booking;
 
 import java.util.List;
 

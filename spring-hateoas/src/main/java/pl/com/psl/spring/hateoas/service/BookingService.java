@@ -4,6 +4,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import pl.com.psl.spring.hateoas.service.entity.Booking;
+import pl.com.psl.spring.hateoas.service.entity.Room;
+import pl.com.psl.spring.hateoas.service.repository.BookingRepository;
+import pl.com.psl.spring.hateoas.service.repository.RoomRepository;
 
 import javax.annotation.PostConstruct;
 import java.time.LocalDate;
@@ -46,12 +50,12 @@ public class BookingService {
         return rooms;
     }
 
-    public Room getRoom(Long roomId) {
-        LOG.info("Getting room by roomId={}", roomId);
+    public Room getRoom(Long roomId) throws BookingServiceException {
+        LOG.info("Getting room by roomId={}...", roomId);
         Room room = roomRepository.findOne(roomId);
         LOG.info("Got room={}", room);
         if (room == null) {
-            throw new IllegalArgumentException("There's no room with roomId=" + roomId);
+            throw new BookingServiceException("Room with roomId=" + roomId + " does not exist", BookingServiceException.ErrorCode.DOES_NOT_EXIST);
         }
         return room;
     }
@@ -65,35 +69,52 @@ public class BookingService {
         return bookings;
     }
 
-    public List<Booking> getBookings(Long roomId) {
-        LOG.info("Getting bookings by roomId={}", roomId);
-        List<Booking> bookings = bookingRepository.findByRoomId(roomId);
+    public List<Booking> getBookings(Long roomId) throws BookingServiceException {
+        LOG.info("Getting bookings by roomId={}...", roomId);
+        Room room = getRoom(roomId);
+        List<Booking> bookings = bookingRepository.findByRoomId(room.getRoomId());
         LOG.info("Got bookings={}", bookings);
         return bookings;
     }
 
-    public Booking getBooking(Long bookingId) {
-        LOG.info("Getting booking by bookingId={}", bookingId);
+    public Booking getBooking(Long bookingId) throws BookingServiceException {
+        LOG.info("Getting booking by bookingId={}...", bookingId);
         Booking booking = bookingRepository.findOne(bookingId);
         LOG.info("Got booking={}", booking);
         if (booking == null) {
-            throw new IllegalArgumentException("There's no booking with bookingId=" + bookingId);
+            throw new BookingServiceException("Booking with bookingId=" + bookingId + " does not exist", BookingServiceException.ErrorCode.DOES_NOT_EXIST);
         }
         return booking;
     }
 
-    public Booking createBooking(Long roomId, String guestName, LocalDate date) {
-        LOG.info("Creating booking with roomId={}, guestName={} and date={}", roomId, guestName, date);
+    public Booking createBooking(Long roomId, String guestName, LocalDate date) throws BookingServiceException {
+        LOG.info("Creating booking with roomId={}, guestName={} and date={}...", roomId, guestName, date);
         Room room = getRoom(roomId);
         List<Booking> bookings = getBookings(room.getRoomId());
-        bookings.stream()
-                .filter(booking -> Objects.equals(booking.getDate(), date))
-                .findFirst()
-                .ifPresent(booking -> {
-                    throw new IllegalArgumentException("Room with roomId=" + booking.getRoomId() + " is not available on date=" + booking.getDate());
-                });
+        try{
+            bookings.stream()
+                    .filter(booking -> Objects.equals(booking.getDate(), date))
+                    .findFirst()
+                    .ifPresent(booking -> {
+                        throw new IllegalArgumentException("Room with roomId=" + booking.getRoomId() + " is not available on date=" + booking.getDate());
+                    });
+        }
+        catch (IllegalArgumentException e){
+            throw new BookingServiceException(e, BookingServiceException.ErrorCode.CONFILICT);
+        }
         Booking booking = bookingRepository.save(new Booking(guestName, room.getRoomId(), date));
         LOG.info("Crated booking={}", booking);
+        return booking;
+    }
+
+    public Booking deleteBooking(Long bookingId) throws BookingServiceException {
+        LOG.info("Deleting booking with bookingId={}...", bookingId);
+        Booking booking = bookingRepository.findOne(bookingId);
+        if(booking == null){
+            throw new BookingServiceException("Booking with bookingId=" + bookingId + " does not exist", BookingServiceException.ErrorCode.DOES_NOT_EXIST);
+        }
+        bookingRepository.delete(booking);
+        LOG.info("Deleted booking with bookingId={}", bookingId);
         return booking;
     }
 }
