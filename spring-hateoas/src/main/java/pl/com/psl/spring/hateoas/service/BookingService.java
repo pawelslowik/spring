@@ -1,11 +1,16 @@
 package pl.com.psl.spring.hateoas.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.time.LocalDate;
-import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by psl on 13.08.17.
@@ -13,56 +18,72 @@ import java.util.stream.Collectors;
 @Component
 public class BookingService {
 
-    private static final List<Room> ROOMS = Collections.unmodifiableList(Arrays.asList(
-            new Room(1L, "Small room 1", "Small room without windows"),
-            new Room(2L, "Small room 2", "Small room with balcony and nice view"),
-            new Room(3L, "Medium room", "Medium room with balcony"),
-            new Room(4L, "VIP room", "Luxurious room with a swimming pool")
-    ));
+    private static final Logger LOG = LoggerFactory.getLogger(BookingService.class);
 
-    private List<Booking> bookings = Collections.synchronizedList(new ArrayList<>());
+    @Autowired
+    private RoomRepository roomRepository;
+    @Autowired
+    private BookingRepository bookingRepository;
+
+    @PostConstruct
+    public void init() {
+        LOG.info("Initializing DB...");
+        Arrays.asList(
+                new Room("Small room 1", "Small room without windows"),
+                new Room("Small room 2", "Small room with balcony and nice view"),
+                new Room("Medium room", "Medium room with balcony"),
+                new Room("VIP room", "Luxurious room with a swimming pool")
+        ).forEach(roomRepository::save);
+        LOG.info("DB initialized!");
+    }
 
     public List<Room> getRooms() {
-        //create new instance of Room, otherwise controller will keep adding links to the same instance
-        return ROOMS.stream()
-                .map(room -> new Room(room.getRoomId(), room.getName(), room.getDescription()))
-                .collect(Collectors.toList());
+        LOG.info("Getting all rooms...");
+        Iterable<Room> foundRooms = roomRepository.findAll();
+        LOG.info("Got room={}", foundRooms);
+        List<Room> rooms = new ArrayList<>();
+        foundRooms.forEach(rooms::add);
+        return rooms;
     }
 
     public Room getRoom(Long roomId) {
-        //create new instance of Room, otherwise controller will keep adding links to the same instance
-        return ROOMS.stream()
-                .filter(room -> Objects.equals(room.getRoomId(), roomId))
-                .findFirst()
-                .map(room -> new Room(room.getRoomId(), room.getName(), room.getDescription()))
-                .orElseThrow(() -> new IllegalArgumentException("There's no room with roomId=" + roomId));
+        LOG.info("Getting room by roomId={}", roomId);
+        Room room = roomRepository.findOne(roomId);
+        LOG.info("Got room={}", room);
+        if (room == null) {
+            throw new IllegalArgumentException("There's no room with roomId=" + roomId);
+        }
+        return room;
     }
 
     public List<Booking> getBookings() {
-        //create new instance of Booking, otherwise controller will keep adding links to the same instance
-        return bookings.stream()
-                .map(booking -> new Booking(booking.getBookingId(), booking.getGuestName(), booking.getRoomId(), booking.getDate()))
-                .collect(Collectors.toList());
+        LOG.info("Getting all bookings...");
+        Iterable<Booking> foundBookings = bookingRepository.findAll();
+        LOG.info("Got bookings={}", foundBookings);
+        List<Booking> bookings = new ArrayList<>();
+        foundBookings.forEach(bookings::add);
+        return bookings;
     }
 
     public List<Booking> getBookings(Long roomId) {
-        //create new instance of Booking, otherwise controller will keep adding links to the same instance
-        return bookings.stream()
-                .filter(booking -> Objects.equals(booking.getRoomId(), roomId))
-                .map(booking -> new Booking(booking.getBookingId(), booking.getGuestName(), booking.getRoomId(), booking.getDate()))
-                .collect(Collectors.toList());
+        LOG.info("Getting bookings by roomId={}", roomId);
+        List<Booking> bookings = bookingRepository.findByRoomId(roomId);
+        LOG.info("Got bookings={}", bookings);
+        return bookings;
     }
 
     public Booking getBooking(Long bookingId) {
-        //create new instance of Booking, otherwise controller will keep adding links to the same instance
-        return bookings.stream()
-                .filter(booking -> Objects.equals(booking.getBookingId(), bookingId))
-                .map(booking -> new Booking(booking.getBookingId(), booking.getGuestName(), booking.getRoomId(), booking.getDate()))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("There's no booking with bookingId=" + bookingId));
+        LOG.info("Getting booking by bookingId={}", bookingId);
+        Booking booking = bookingRepository.findOne(bookingId);
+        LOG.info("Got booking={}", booking);
+        if (booking == null) {
+            throw new IllegalArgumentException("There's no booking with bookingId=" + bookingId);
+        }
+        return booking;
     }
 
     public Booking createBooking(Long roomId, String guestName, LocalDate date) {
+        LOG.info("Creating booking with roomId={}, guestName={} and date={}", roomId, guestName, date);
         Room room = getRoom(roomId);
         List<Booking> bookings = getBookings(room.getRoomId());
         bookings.stream()
@@ -71,8 +92,8 @@ public class BookingService {
                 .ifPresent(booking -> {
                     throw new IllegalArgumentException("Room with roomId=" + booking.getRoomId() + " is not available on date=" + booking.getDate());
                 });
-        Booking booking = new Booking(ThreadLocalRandom.current().nextLong(Long.MAX_VALUE), guestName, room.getRoomId(), date);
-        this.bookings.add(booking);
+        Booking booking = bookingRepository.save(new Booking(guestName, room.getRoomId(), date));
+        LOG.info("Crated booking={}", booking);
         return booking;
     }
 }
