@@ -12,9 +12,9 @@ import pl.com.psl.spring.hateoas.service.BookingServiceException;
  * Created by psl on 15.08.17.
  */
 @ControllerAdvice
-public class ExceptionHandlerAdvice {
+public class ExceptionHandlerControllerAdvice {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ExceptionHandlerAdvice.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ExceptionHandlerControllerAdvice.class);
 
     @ExceptionHandler(BookingServiceException.class)
     public ResponseEntity handleException(BookingServiceException e) {

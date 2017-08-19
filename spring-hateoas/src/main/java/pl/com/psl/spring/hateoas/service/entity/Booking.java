@@ -34,6 +34,11 @@ public class Booking extends ResourceSupport{
         this.date = date;
     }
 
+    public Booking(Long bookingId, String guestName, Long roomId, LocalDate date) {
+        this(guestName, roomId, date);
+        this.bookingId = bookingId;
+    }
+
     public Long getBookingId() {
         return bookingId;
     }

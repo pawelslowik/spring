@@ -10,7 +10,6 @@ import pl.com.psl.spring.hateoas.service.repository.BookingRepository;
 import pl.com.psl.spring.hateoas.service.repository.RoomRepository;
 
 import javax.annotation.PostConstruct;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -33,8 +32,8 @@ public class BookingService {
     public void init() {
         LOG.info("Initializing DB...");
         Arrays.asList(
-                new Room("Small room 1", "Small room without windows"),
-                new Room("Small room 2", "Small room with balcony and nice view"),
+                new Room("Cellar", "Small cellar without windows"),
+                new Room("Small room", "Small room with balcony and nice view"),
                 new Room("Medium room", "Medium room with balcony"),
                 new Room("VIP room", "Luxurious room with a swimming pool")
         ).forEach(roomRepository::save);
@@ -87,22 +86,21 @@ public class BookingService {
         return booking;
     }
 
-    public Booking createBooking(Long roomId, String guestName, LocalDate date) throws BookingServiceException {
-        LOG.info("Creating booking with roomId={}, guestName={} and date={}...", roomId, guestName, date);
-        Room room = getRoom(roomId);
+    public Booking createBooking(Booking newBooking) throws BookingServiceException {
+        LOG.info("Creating booking={}...", newBooking);
+        Room room = getRoom(newBooking.getRoomId());
         List<Booking> bookings = getBookings(room.getRoomId());
-        try{
+        try {
             bookings.stream()
-                    .filter(booking -> Objects.equals(booking.getDate(), date))
+                    .filter(booking -> Objects.equals(booking.getDate(), newBooking.getDate()))
                     .findFirst()
                     .ifPresent(booking -> {
                         throw new IllegalArgumentException("Room with roomId=" + booking.getRoomId() + " is not available on date=" + booking.getDate());
                     });
-        }
-        catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             throw new BookingServiceException(e, BookingServiceException.ErrorCode.CONFILICT);
         }
-        Booking booking = bookingRepository.save(new Booking(guestName, room.getRoomId(), date));
+        Booking booking = bookingRepository.save(newBooking);
         LOG.info("Crated booking={}", booking);
         return booking;
     }
@@ -110,7 +108,7 @@ public class BookingService {
     public Booking deleteBooking(Long bookingId) throws BookingServiceException {
         LOG.info("Deleting booking with bookingId={}...", bookingId);
         Booking booking = bookingRepository.findOne(bookingId);
-        if(booking == null){
+        if (booking == null) {
             throw new BookingServiceException("Booking with bookingId=" + bookingId + " does not exist", BookingServiceException.ErrorCode.DOES_NOT_EXIST);
         }
         bookingRepository.delete(booking);

@@ -10,7 +10,6 @@ import pl.com.psl.spring.hateoas.service.BookingService;
 import pl.com.psl.spring.hateoas.service.BookingServiceException;
 import pl.com.psl.spring.hateoas.service.entity.Room;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
@@ -27,12 +26,15 @@ public class BookingController {
     private BookingService bookingService;
 
     @RequestMapping(path = "/rooms", method = RequestMethod.GET)
-    public HttpEntity<List<Room>> getRooms() throws BookingServiceException {
+    public HttpEntity<ItemsResource<Room>> getRooms() throws BookingServiceException {
         List<Room> rooms = bookingService.getRooms();
         for (Room room : rooms) {
             room.add(linkTo(methodOn(BookingController.class).getRoom(room.getRoomId())).withSelfRel());
         }
-        return new ResponseEntity<>(rooms, HttpStatus.OK);
+        ItemsResource<Room> roomsResource = new ItemsResource<>(rooms);
+        roomsResource.add(linkTo(methodOn(BookingController.class).getRooms()).withSelfRel());
+        roomsResource.add(linkTo(methodOn(BookingController.class).getBookings()).withRel("bookings"));
+        return new ResponseEntity<>(roomsResource, HttpStatus.OK);
     }
 
     @RequestMapping(path = "/rooms/{roomId}", method = RequestMethod.GET)
@@ -44,21 +46,25 @@ public class BookingController {
     }
 
     @RequestMapping(path = "/rooms/{roomId}/bookings", method = RequestMethod.GET)
-    public HttpEntity<List<Booking>> getBookings(@PathVariable Long roomId) throws BookingServiceException {
+    public HttpEntity<ItemsResource<Booking>> getBookings(@PathVariable Long roomId) throws BookingServiceException {
         List<Booking> bookings = bookingService.getBookings(roomId);
         for (Booking booking : bookings) {
             booking.add(linkTo(methodOn(BookingController.class).getBooking(booking.getBookingId())).withSelfRel());
         }
-        return new ResponseEntity<>(bookings, HttpStatus.OK);
+        ItemsResource<Booking> bookingsResource = new ItemsResource<>(bookings);
+        bookingsResource.add(linkTo(methodOn(BookingController.class).getBookings(roomId)).withSelfRel());
+        return new ResponseEntity<>(bookingsResource, HttpStatus.OK);
     }
 
     @RequestMapping(path = "/rooms/bookings", method = RequestMethod.GET)
-    public HttpEntity<List<Booking>> getBookings() throws BookingServiceException {
+    public HttpEntity<ItemsResource<Booking>> getBookings() throws BookingServiceException {
         List<Booking> bookings = bookingService.getBookings();
         for (Booking booking : bookings) {
             booking.add(linkTo(methodOn(BookingController.class).getBooking(booking.getBookingId())).withSelfRel());
         }
-        return new ResponseEntity<>(bookings, HttpStatus.OK);
+        ItemsResource<Booking> bookingsResource = new ItemsResource<>(bookings);
+        bookingsResource.add(linkTo(methodOn(BookingController.class).getBookings()).withSelfRel());
+        return new ResponseEntity<>(bookingsResource, HttpStatus.OK);
     }
 
     @RequestMapping(path = "/rooms/bookings/{bookingId}", method = RequestMethod.GET)
@@ -69,8 +75,15 @@ public class BookingController {
     }
 
     @RequestMapping(path = "/rooms/{roomId}/bookings", method = RequestMethod.POST)
-    public HttpEntity<Booking> createBooking(@PathVariable Long roomId, @RequestBody BookingRequest bookingRequest) throws BookingServiceException {
-        Booking booking = bookingService.createBooking(roomId, bookingRequest.getGuestName(), LocalDate.parse(bookingRequest.getDate()));
+    public HttpEntity<Booking> createBooking(@PathVariable Long roomId, @RequestBody Booking newBooking) throws BookingServiceException {
+        Booking booking = bookingService.createBooking(new Booking(newBooking.getGuestName(), roomId, newBooking.getDate()));
+        booking.add(linkTo(methodOn(BookingController.class).getBooking(booking.getBookingId())).withSelfRel());
+        return new ResponseEntity<>(booking, HttpStatus.CREATED);
+    }
+
+    @RequestMapping(path = "/rooms/bookings", method = RequestMethod.POST)
+    public HttpEntity<Booking> createBooking(@RequestBody Booking newBooking) throws BookingServiceException {
+        Booking booking = bookingService.createBooking(newBooking);
         booking.add(linkTo(methodOn(BookingController.class).getBooking(booking.getBookingId())).withSelfRel());
         return new ResponseEntity<>(booking, HttpStatus.CREATED);
     }
