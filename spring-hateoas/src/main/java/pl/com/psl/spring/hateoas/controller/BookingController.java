@@ -3,6 +3,7 @@ package pl.com.psl.spring.hateoas.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.com.psl.spring.hateoas.service.entity.Booking;
@@ -74,14 +75,14 @@ public class BookingController {
         return new ResponseEntity<>(booking, HttpStatus.OK);
     }
 
-    @RequestMapping(path = "/rooms/{roomId}/bookings", method = RequestMethod.POST)
+    @RequestMapping(path = "/rooms/{roomId}/bookings", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     public HttpEntity<Booking> createBooking(@PathVariable Long roomId, @RequestBody Booking newBooking) throws BookingServiceException {
         Booking booking = bookingService.createBooking(new Booking(newBooking.getGuestName(), roomId, newBooking.getDate()));
         booking.add(linkTo(methodOn(BookingController.class).getBooking(booking.getBookingId())).withSelfRel());
         return new ResponseEntity<>(booking, HttpStatus.CREATED);
     }
 
-    @RequestMapping(path = "/rooms/bookings", method = RequestMethod.POST)
+    @RequestMapping(path = "/rooms/bookings", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     public HttpEntity<Booking> createBooking(@RequestBody Booking newBooking) throws BookingServiceException {
         Booking booking = bookingService.createBooking(newBooking);
         booking.add(linkTo(methodOn(BookingController.class).getBooking(booking.getBookingId())).withSelfRel());
