@@ -6,6 +6,8 @@ import java.util.List;
 
 /**
  * Created by psl on 19.08.17.
+ *
+ * Wrapper for list of resources, required to produce HAL-compliant json.
  */
 public class ItemsResource<T> extends ResourceSupport {
 
