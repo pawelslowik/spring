@@ -30,6 +30,7 @@
 
     <modules>
         <module>spring-hateoas</module>
+        <module>spring-event</module>
     </modules>
 
 </project>
