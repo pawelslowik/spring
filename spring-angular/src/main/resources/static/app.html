@@ -10,7 +10,10 @@
         <h1>Employee app</h1>
         <hr>
         <div id="employee-list" ng-controller="employeeController">
-            <button ng-click="loadEmployees()">Load employees</button>
+            <div id="employee-list-panel">
+                <button ng-click="loadEmployees()">Load employees</button>
+                <label id="employee-list-status" ng-if="status.message" ng-class="{'success' : status.success, 'error' : !status.success}">{{ status.message }}</label>
+            </div>
             <table>
                 <tr>
                     <th>Id</th>

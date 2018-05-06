@@ -16,14 +16,28 @@ th {
 }
 
 tr:nth-child(even) {
-    background-color: #F5F5F5
+    background-color: #F5F5F5;
 }
 
 tr:hover {
-    background-color: #D3D3D3
+    background-color: #D3D3D3;
 }
 
 .expand {
     width:100%;
     box-sizing:border-box;
+}
+
+.success {
+    background: #4CAF50;
+}
+
+.error {
+    background: #F44336;
+}
+
+#employee-list-status {
+    color: white;
+    padding: 3px 10px;
+    border-radius: 5px;
 }

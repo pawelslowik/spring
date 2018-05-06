@@ -16,26 +16,24 @@ public class EmployeeController {
     @Autowired
     private EmployeeService employeeService;
 
-    @RequestMapping(path = "/")
+    @RequestMapping(path = "/", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
     public String app() {
         return "app.html";
     }
 
-    @RequestMapping(path = "/employees", method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(path = "/employees", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public HttpEntity<Response> getEmployees() {
         return new ResponseEntity<>(new Response(employeeService.getEmployees(), "Successfully got all employees"), HttpStatus.OK);
     }
 
-    @RequestMapping(path = "/employees", method = RequestMethod.POST,
-            consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(path = "/employees", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public HttpEntity<Response> createEmployee(@RequestBody Employee employee) {
         return new ResponseEntity<>(new Response(employeeService.createEmployee(employee), "Successfully created employee"), HttpStatus.CREATED);
     }
 
-    @RequestMapping(path = "/employees/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(path = "/employees/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public HttpEntity<Response> deleteEmployee(@PathVariable Long id) {
         return new ResponseEntity<>(new Response(employeeService.deleteEmployee(id), "Successfully deleted employee"), HttpStatus.OK);
