@@ -18,7 +18,7 @@ describe('Employee Controller', function () {
         });
         $scope.newEmployee = {
             name: 'bob',
-            age: 44,
+            age: '44',
             address: 'warsaw'
         };
     }));
@@ -52,7 +52,7 @@ describe('Employee Controller', function () {
         expect($scope.status.success).toEqual(false);
         expect($scope.newEmployee).toEqual({
             name: 'bob',
-            age: 44,
+            age: '44',
             address: 'warsaw'
         });
         expect($scope.loadEmployees).not.toHaveBeenCalled();
@@ -70,7 +70,7 @@ describe('Employee Controller', function () {
         expect($scope.status.success).toEqual(false);
         expect($scope.newEmployee).toEqual({
             name: 'bob',
-            age: 44,
+            age: '44',
             address: 'warsaw'
         });
         expect($scope.loadEmployees).not.toHaveBeenCalled();
@@ -89,7 +89,7 @@ describe('Employee Controller', function () {
         expect($scope.status.success).toEqual(false);
         expect($scope.newEmployee).toEqual({
             name: 'bob',
-            age: 44,
+            age: '44',
             address: 'warsaw'
         });
         expect($scope.loadEmployees).not.toHaveBeenCalled();
@@ -105,7 +105,7 @@ describe('Employee Controller', function () {
         expect($scope.status.success).toEqual(true);
         expect($scope.newEmployee).toEqual({
             name: 'bob',
-            age: 44,
+            age: '44',
             address: 'warsaw'
         });
         expect($scope.loadEmployees).toHaveBeenCalled();
@@ -125,7 +125,7 @@ describe('Employee Controller', function () {
         expect($scope.status.success).toEqual(false);
         expect($scope.newEmployee).toEqual({
             name: 'bob',
-            age: 44,
+            age: '44',
             address: 'warsaw'
         });
         expect($scope.loadEmployees).not.toHaveBeenCalled();
@@ -148,5 +148,9 @@ describe('Employee Controller', function () {
         expect($scope.status.message).toEqual("Could not load list of employees due to an error.");
         expect($scope.status.success).toEqual(false);
         expect($scope.newEmployee).toEqual({});
+    });
+
+    it('should mark new valid employee as valid', function() {
+        expect($scope.newEmployeeValid()).toEqual(true);
     });
 });

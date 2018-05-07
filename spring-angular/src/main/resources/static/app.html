@@ -24,10 +24,10 @@
                 </tr>
                 <tr>
                     <td>-</td>
-                    <td><input class="expand" ng-model="newEmployee.name" ng-change="validateNewEmployee()"></td>
-                    <td><input class="expand" ng-model="newEmployee.age" ng-change="validateNewEmployee()"></td>
-                    <td><input class="expand" ng-model="newEmployee.address" ng-change="validateNewEmployee()"></td>
-                    <td><button class="expand" ng-click="createEmployee()" ng-disabled="!newEmployeeValid">Create</button></td>
+                    <td><input class="expand" ng-model="newEmployee.name"></td>
+                    <td><input class="expand" ng-model="newEmployee.age"></td>
+                    <td><input class="expand" ng-model="newEmployee.address"></td>
+                    <td><button class="expand" ng-click="createEmployee()" ng-disabled="!newEmployeeValid()">Create</button></td>
                 </tr>
                 <tr ng-repeat="employee in employees | filter : matchingInput">
                     <td>{{ employee.id }}</td>
