@@ -10,7 +10,7 @@ function($scope, $http, $timeout) {
     }
 
     $scope.createEmployee = function() {
-        $http.post("/employees", angular.toJson($scope.newEmployee)).then(function(successResponse) {
+        $http.post("/employees", $scope.newEmployee).then(function(successResponse) {
             updateStatusOnResponse(successResponse, "Successfully created employee with id=" + successResponse.data.payload.id);
             $scope.newEmployee = {};
             $scope.loadEmployees();
