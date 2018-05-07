@@ -153,4 +153,18 @@ describe('Employee Controller', function () {
     it('should mark new valid employee as valid', function() {
         expect($scope.newEmployeeValid()).toEqual(true);
     });
+
+    it('should match new employee with with missing properties', function(){
+        $scope.newEmployee = {};
+        let employee = {
+            name: 'tom',
+            age: '34',
+            address: 'warsaw'
+        };
+        expect($scope.matchingNewEmployee(employee)).toEqual(true);
+    });
+
+    it('should match new employee', function() {
+        expect($scope.matchingNewEmployee($scope.newEmployee)).toEqual(true);
+    });
 });

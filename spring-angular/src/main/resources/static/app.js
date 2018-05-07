@@ -37,7 +37,7 @@ app.controller("employeeController", ['$scope', '$http', '$timeout',
             });
         };
 
-        $scope.matchingInput = function (employee) {
+        $scope.matchingNewEmployee = function (employee) {
             let nameMatching = !$scope.newEmployee.name || employee.name.indexOf($scope.newEmployee.name) >= 0;
             let ageMatching = !$scope.newEmployee.age || ('' + employee.age).indexOf($scope.newEmployee.age) >= 0;
             let addressMatching = !$scope.newEmployee.address || employee.address.indexOf($scope.newEmployee.address) >= 0;
@@ -46,7 +46,7 @@ app.controller("employeeController", ['$scope', '$http', '$timeout',
 
         $scope.newEmployeeValid = function () {
             let nameValid = $scope.newEmployee.name && $scope.newEmployee.name.trim().length > 0;
-            let ageValid = $scope.newEmployee.age && $scope.newEmployee.age.indexOf(".") < 0 && !isNaN($scope.newEmployee.age) && parseInt($scope.newEmployee.age) > 0;
+            let ageValid = $scope.newEmployee.age && ('' + $scope.newEmployee.age).indexOf(".") < 0 && !isNaN($scope.newEmployee.age) && parseInt($scope.newEmployee.age) > 0;
             let addressValid = $scope.newEmployee.address && $scope.newEmployee.address.trim().length > 0;
             return nameValid && ageValid && addressValid;
         };
