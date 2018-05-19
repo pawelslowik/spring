@@ -17,7 +17,7 @@ module.exports = function(config) {
     files: [
       'src/main/resources/static/*.js',
       'node_modules/angular-mocks/angular-mocks.js',
-      'src/test/js/*.js'
+      'src/test/js/unit/*.js'
     ],
 
 

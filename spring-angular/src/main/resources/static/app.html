@@ -27,14 +27,14 @@
                     <td><input class="expand" ng-model="newEmployee.name"></td>
                     <td><input class="expand" ng-model="newEmployee.age"></td>
                     <td><input class="expand" ng-model="newEmployee.address"></td>
-                    <td><button class="expand" ng-click="createEmployee()" ng-disabled="!newEmployeeValid()">Create</button></td>
+                    <td><button id="createButton" class="expand" ng-click="createEmployee()" ng-disabled="!newEmployeeValid()">Create</button></td>
                 </tr>
                 <tr ng-repeat="employee in employees | filter : matchingNewEmployee">
                     <td>{{ employee.id }}</td>
                     <td>{{ employee.name }}</td>
                     <td>{{ employee.age }}</td>
                     <td>{{ employee.address }}</td>
-                    <td><button class="expand" ng-click="deleteEmployee(employee.id)">Delete</button></td>
+                    <td><button id="deleteButton{{$index}}" class="expand" ng-click="deleteEmployee(employee.id)">Delete</button></td>
                 </tr>
             </table>
         </div>
