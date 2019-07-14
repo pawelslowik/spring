@@ -1,0 +1,13 @@
+package pl.com.psl.spring.cloudcontract.consumer;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+class Resource {
+    private long id;
+    private String stringValue;
+}
