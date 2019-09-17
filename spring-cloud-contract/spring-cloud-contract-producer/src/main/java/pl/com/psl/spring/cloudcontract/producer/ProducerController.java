@@ -5,7 +5,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static java.util.Optional.ofNullable;
 
@@ -29,5 +32,14 @@ public class ProducerController {
         Long key = resources.keySet().stream().max(Long::compareTo).orElse(0L);
         resources.put(key, new Resource(key, request.getStringValue()));
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PutMapping(value = "/resources/{id}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity put(@PathVariable long id, @RequestBody ResourceRequest request) {
+        if(!resources.containsKey(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        resources.put(id, new Resource(id, request.getStringValue()));
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

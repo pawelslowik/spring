@@ -6,6 +6,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.stubrunner.spring.AutoConfigureStubRunner;
 import org.springframework.cloud.contract.stubrunner.spring.StubRunnerProperties;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -52,5 +53,14 @@ public class ProviderIntegrationTest {
         assertThat(responseEntity.getBody()).isNotNull();
         Collection<Resource> resources = responseEntity.getBody();
         assertThat(resources).contains(new Resource(0, "anything"));
+    }
+
+    @Test
+    public void shouldPutResource() {
+        RestTemplate restTemplate = new RestTemplate();
+        ResourceRequest request = new ResourceRequest("whatever");
+        ResponseEntity<Void> responseEntity = restTemplate.exchange(RESOURCES_ENDPOINT + "/0", HttpMethod.PUT, new HttpEntity<>(request), new ParameterizedTypeReference<Void>(){});
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(responseEntity.getBody()).isNull();
     }
 }
