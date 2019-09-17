@@ -5,8 +5,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static java.util.Optional.ofNullable;
 
@@ -18,6 +17,11 @@ public class ProducerController {
     @GetMapping(value = "/resources/{id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<Resource> get(@PathVariable long id) {
         return ofNullable(resources.get(id)).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping(value = "/resources", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<List<Resource>> getAll() {
+        return ResponseEntity.ok(new ArrayList<>(resources.values()));
     }
 
     @PostMapping(value = "/resources", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)

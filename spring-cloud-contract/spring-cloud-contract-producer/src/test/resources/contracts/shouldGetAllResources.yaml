@@ -1,0 +1,8 @@
+request:
+  method: GET
+  url: /resources
+response:
+  status: 200
+  headers:
+    Content-Type: application/json;charset=UTF-8
+  body: '[{ "id": 0, "stringValue": "anything"}]'
