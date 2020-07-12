@@ -1,0 +1,15 @@
+syntax = "proto3";
+package pl.com.psl.spring.grpc.server.invoice;
+option java_multiple_files = true;
+
+message InvoiceProcessResponse {
+    string name = 1;
+}
+
+message InvoiceProcessRequest {
+    int32 id = 1;
+}
+
+service InvoiceProcessor {
+    rpc processInvoice(InvoiceProcessRequest) returns (InvoiceProcessResponse);
+}
