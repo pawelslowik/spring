@@ -1,14 +1,14 @@
-package pl.com.psl.spring.grpc.client.invoice;
+package pl.com.psl.spring.grpc.commons;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
-public class Invoice {
-    String name;
+public class InvoiceRequest {
+    private int id;
 }

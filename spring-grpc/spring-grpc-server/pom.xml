@@ -13,6 +13,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>pl.com.psl.spring</groupId>
+            <artifactId>spring-grcp-commons</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
