@@ -5,9 +5,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import pl.com.psl.spring.grpc.commons.InvoiceRequest;
 import pl.com.psl.spring.grpc.commons.InvoiceResponse;
+import pl.com.psl.spring.grpc.commons.InvoicesRequest;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import static java.util.Optional.ofNullable;
 
 @Service
 @Slf4j
@@ -22,5 +28,14 @@ public class InvoiceRestService implements InvoiceService {
         Instant processingEnd = Instant.now();
         log.info("Processing time:{} ms", Duration.between(processingStart, processingEnd).toMillis());
         return invoice;
+    }
+
+    @Override
+    public List<InvoiceResponse> processInvoices(InvoicesRequest request) {
+        Instant processingStart = Instant.now();
+        InvoiceResponse[] invoices = invoiceRestTemplate.postForObject("http://localhost:8081/invoices?projection=list", request, InvoiceResponse[].class);
+        Instant processingEnd = Instant.now();
+        log.info("Processing time:{} ms", Duration.between(processingStart, processingEnd).toMillis());
+        return ofNullable(invoices).map(Arrays::asList).orElseGet(Collections::emptyList);
     }
 }

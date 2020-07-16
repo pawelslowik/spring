@@ -1,17 +1,45 @@
 syntax = "proto3";
+import "google/protobuf/timestamp.proto";
 package pl.com.psl.spring.grpc.server.invoice;
 option java_multiple_files = true;
+
+message Product {
+    string name = 1;
+    int32 amount = 2;
+    int32 price = 3;
+}
+
+message Address {
+    string street = 1;
+    string city = 2;
+    string postalCode = 3;
+}
 
 message InvoiceProcessResponse {
     int32 id = 1;
     string name = 2;
-    string status = 3;
+    repeated Product product = 3;
+    string sellerName = 4;
+    string buyerName = 5;
+    Address shippingAddress = 6;
+    google.protobuf.Timestamp invoiceDate = 7;
+    int32 totalPrice = 8;
+    string status = 9;
+}
+
+message InvoicesProcessResponse {
+    repeated InvoiceProcessResponse responses = 1;
 }
 
 message InvoiceProcessRequest {
     int32 id = 1;
 }
 
+message InvoicesProcessRequest {
+    repeated int32 ids = 1;
+}
+
 service InvoiceProcessor {
     rpc processInvoice(InvoiceProcessRequest) returns (InvoiceProcessResponse);
+    rpc processInvoices(InvoicesProcessRequest) returns (InvoicesProcessResponse);
 }
