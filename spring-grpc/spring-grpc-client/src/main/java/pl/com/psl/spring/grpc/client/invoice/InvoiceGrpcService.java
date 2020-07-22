@@ -2,8 +2,11 @@ package pl.com.psl.spring.grpc.client.invoice;
 
 import com.google.protobuf.Timestamp;
 import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
+import io.grpc.netty.NettyChannelBuilder;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import pl.com.psl.spring.grpc.commons.AddressResponse;
 import pl.com.psl.spring.grpc.commons.InvoiceResponse;
@@ -13,8 +16,6 @@ import pl.com.psl.spring.grpc.server.invoice.*;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.List;
 
 import static java.time.Instant.ofEpochSecond;
@@ -23,13 +24,20 @@ import static java.time.ZoneId.of;
 import static java.util.stream.Collectors.toList;
 
 @Service
+@Profile({"!grpc-secure"})
 @Slf4j
 public class InvoiceGrpcService implements InvoiceService {
 
     private InvoiceProcessorGrpc.InvoiceProcessorBlockingStub invoiceProcessor;
 
-    public InvoiceGrpcService() {
-        ManagedChannel managedChannel = ManagedChannelBuilder.forAddress("localhost", 6565).usePlaintext().build();
+    @Autowired
+    public InvoiceGrpcService(
+            @Value("${invoice.server.host}") String serverHost,
+            @Value("${invoice.server.port.grpc}") int serverPort) {
+        this(NettyChannelBuilder.forAddress(serverHost, serverPort).usePlaintext().build());
+    }
+
+    InvoiceGrpcService(ManagedChannel managedChannel) {
         invoiceProcessor = InvoiceProcessorGrpc.newBlockingStub(managedChannel);
     }
 

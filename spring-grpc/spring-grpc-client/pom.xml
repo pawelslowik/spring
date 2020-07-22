@@ -14,7 +14,7 @@
     <dependencies>
         <dependency>
             <groupId>pl.com.psl.spring</groupId>
-            <artifactId>spring-grcp-commons</artifactId>
+            <artifactId>spring-grpc-commons</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

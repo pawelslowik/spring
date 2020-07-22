@@ -7,9 +7,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.com.psl.spring.grpc.commons.*;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -26,7 +23,7 @@ public class InvoiceController {
         return process(request.getId());
     }
 
-    @PostMapping(params ="projection=list", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(params = "projection=list", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public List<InvoiceResponse> processInvoices(@RequestBody InvoicesRequest request) {
         return request.getIds().stream().map(this::process).collect(toList());
     }

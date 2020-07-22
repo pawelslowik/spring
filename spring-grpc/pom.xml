@@ -7,7 +7,7 @@
     <modules>
         <module>spring-grpc-server</module>
         <module>spring-grpc-client</module>
-        <module>spring-grcp-commons</module>
+        <module>spring-grpc-commons</module>
     </modules>
 
     <groupId>pl.com.psl.spring</groupId>
