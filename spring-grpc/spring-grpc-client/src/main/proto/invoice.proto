@@ -41,5 +41,5 @@ message InvoicesProcessRequest {
 
 service InvoiceProcessor {
     rpc processInvoice(InvoiceProcessRequest) returns (InvoiceProcessResponse);
-    rpc processInvoices(InvoicesProcessRequest) returns (InvoicesProcessResponse);
+    rpc processInvoices(InvoicesProcessRequest) returns (stream InvoiceProcessResponse);
 }

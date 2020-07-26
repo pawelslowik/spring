@@ -21,11 +21,8 @@ public class InvoiceGrpcService extends InvoiceProcessorImplBase {
     }
 
     @Override
-    public void processInvoices(InvoicesProcessRequest request, StreamObserver<InvoicesProcessResponse> responseObserver) {
-        InvoicesProcessResponse response = InvoicesProcessResponse.newBuilder()
-                .addAllResponses(request.getIdsList().stream().map(this::process).collect(toList()))
-                .build();
-        responseObserver.onNext(response);
+    public void processInvoices(InvoicesProcessRequest request, StreamObserver<InvoiceProcessResponse> responseObserver) {
+        request.getIdsList().forEach(id -> responseObserver.onNext(process(id)));
         responseObserver.onCompleted();
     }
 
