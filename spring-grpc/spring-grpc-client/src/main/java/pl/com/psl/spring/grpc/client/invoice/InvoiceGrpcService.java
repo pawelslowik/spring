@@ -14,10 +14,7 @@ import pl.com.psl.spring.grpc.commons.AddressResponse;
 import pl.com.psl.spring.grpc.commons.InvoiceResponse;
 import pl.com.psl.spring.grpc.commons.InvoicesRequest;
 import pl.com.psl.spring.grpc.commons.ProductResponse;
-import pl.com.psl.spring.grpc.server.invoice.InvoiceProcessRequest;
-import pl.com.psl.spring.grpc.server.invoice.InvoiceProcessResponse;
-import pl.com.psl.spring.grpc.server.invoice.InvoiceProcessorGrpc;
-import pl.com.psl.spring.grpc.server.invoice.InvoicesProcessRequest;
+import pl.com.psl.spring.grpc.server.invoice.*;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -55,23 +52,26 @@ public class InvoiceGrpcService implements InvoiceService {
     public InvoiceResponse processInvoice(int id) {
         Instant processingStart = Instant.now();
         InvoiceProcessResponse invoiceProcessResponse = invoiceProcessor.processInvoice(InvoiceProcessRequest.newBuilder().setId(id).build());
+        InvoiceResponse invoiceResponse = toInvoiceResponse(invoiceProcessResponse);
         Instant processingEnd = Instant.now();
         log.info("Processing time:{} ms", Duration.between(processingStart, processingEnd).toMillis());
-        return toInvoiceResponse(invoiceProcessResponse);
+        return invoiceResponse;
     }
 
     @Override
     @SneakyThrows
     public List<InvoiceResponse> processInvoices(InvoicesRequest request) {
         List<InvoiceResponse> responses = new ArrayList<>(request.getIds().size());
-        final CountDownLatch finishLatch = new CountDownLatch(1);
         Instant processingStart = Instant.now();
+        final CountDownLatch finishLatch = new CountDownLatch(1);
         invoiceAsyncProcessor.processInvoices(InvoicesProcessRequest.newBuilder()
                 .addAllIds(request.getIds())
                 .build(), new StreamObserver<>() {
             @Override
-            public void onNext(InvoiceProcessResponse response) {
-                responses.add(toInvoiceResponse(response));
+            public void onNext(InvoiceProcessResponse invoiceProcessResponse) {
+                responses.add(toInvoiceResponse(invoiceProcessResponse));
+                log.info("Response received for id={} in {} ms from start",
+                        invoiceProcessResponse.getId(), Duration.between(processingStart, Instant.now()).toMillis());
             }
 
             @Override
@@ -82,8 +82,7 @@ public class InvoiceGrpcService implements InvoiceService {
 
             @Override
             public void onCompleted() {
-                Instant processingEnd = Instant.now();
-                log.info("Processing time:{} ms", Duration.between(processingStart, processingEnd).toMillis());
+                log.info("Processing time:{} ms", Duration.between(processingStart, Instant.now()).toMillis());
                 finishLatch.countDown();
             }
         });
