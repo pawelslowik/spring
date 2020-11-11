@@ -61,6 +61,22 @@ public class InvoiceGrpcService implements InvoiceService {
     @Override
     @SneakyThrows
     public List<InvoiceResponse> processInvoices(InvoicesRequest request) {
+        return bulkProcess(request);
+    }
+
+    private List<InvoiceResponse> bulkProcess(InvoicesRequest request) {
+        Instant processingStart = Instant.now();
+        List<InvoiceResponse> responses = new ArrayList<>(request.getIds().size());
+        invoiceProcessor.bulkProcessInvoices(
+                InvoicesProcessRequest.newBuilder()
+                        .addAllIds(request.getIds())
+                        .build()
+        ).getResponsesList().stream().map(this::toInvoiceResponse).forEach(responses::add);
+        log.info("Processing time:{} ms", Duration.between(processingStart, Instant.now()).toMillis());
+        return responses;
+    }
+
+    private List<InvoiceResponse> asyncProcess(InvoicesRequest request) throws InterruptedException {
         List<InvoiceResponse> responses = new ArrayList<>(request.getIds().size());
         Instant processingStart = Instant.now();
         final CountDownLatch finishLatch = new CountDownLatch(1);

@@ -26,6 +26,16 @@ public class InvoiceGrpcService extends InvoiceProcessorImplBase {
         responseObserver.onCompleted();
     }
 
+    @Override
+    public void bulkProcessInvoices(InvoicesProcessRequest request, StreamObserver<InvoicesProcessResponse> responseObserver) {
+        responseObserver.onNext(InvoicesProcessResponse.newBuilder()
+                .addAllResponses(
+                        request.getIdsList().stream().map(this::process).collect(toList())
+                )
+                .build());
+        responseObserver.onCompleted();
+    }
+
     private InvoiceProcessResponse process(int id) {
         List<Product> products = IntStream.rangeClosed(1, 10)
                 .mapToObj(i -> Product.newBuilder()
